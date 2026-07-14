@@ -8,12 +8,18 @@ import com.rms.repository.CustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+//pagination
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Sort;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -94,5 +100,53 @@ public class CustomerService {
                 .orElseThrow(() -> new NoSuchElementException("Customer not found"));
 
         customerRepository.delete(customer);
+    }
+
+    // Get Customers with Pagination
+    public Page<CustomerDTO> getCustomersWithPagination(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+
+        return customerPage.map(customer ->
+                modelMapper.map(customer, CustomerDTO.class));
+    }
+
+    // Get Customers with Sorting
+    public List<CustomerDTO> getCustomersWithSorting(String field, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(field).descending()
+                : Sort.by(field).ascending();
+
+        List<Customer> customers = customerRepository.findAll(sort);
+
+        return customers.stream()
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    // Search Customer By Name
+    public List<CustomerDTO> searchCustomersByName(String name) {
+
+        List<Customer> customers =
+                customerRepository.findByFullNameContainingIgnoreCase(name);
+
+        return customers.stream()
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
+                .toList();
+    }
+
+    // Find Customer By Email using @Query
+    public CustomerDTO findCustomerByEmail(String email) {
+
+        Customer customer = customerRepository.findCustomerByEmail(email);
+
+        if (customer == null) {
+            throw new NoSuchElementException("Customer not found");
+        }
+
+        return modelMapper.map(customer, CustomerDTO.class);
     }
 }

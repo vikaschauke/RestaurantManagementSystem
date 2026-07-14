@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import com.rms.dto.CustomerDTO;  //Security perpose
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page; //Pegigenation
 
 import com.rms.dto.CustomerRegisterDTO;
 import java.util.List;
@@ -115,6 +116,76 @@ public class CustomerController {
         customerService.deleteCustomer(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Get Customers with Pagination",
+            description = "Fetch customers page by page"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Customers Retrieved Successfully")
+    })
+    @GetMapping("/pagination")
+    public ResponseEntity<Page<CustomerDTO>> getCustomersWithPagination(
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<CustomerDTO> customers =
+                customerService.getCustomersWithPagination(page, size);
+
+        return ResponseEntity.ok(customers);
+    }
+
+    @Operation(
+            summary = "Get Customers with Sorting",
+            description = "Fetch all customers sorted by any field"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Customers Retrieved Successfully")
+    })
+    @GetMapping("/sort")
+    public ResponseEntity<List<CustomerDTO>> getCustomersWithSorting(
+            @RequestParam String field,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        List<CustomerDTO> customers =
+                customerService.getCustomersWithSorting(field, direction);
+
+        return ResponseEntity.ok(customers);
+    }
+
+    @Operation(
+            summary = "Search Customers By Name",
+            description = "Search customers using full name"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Customers Found")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<List<CustomerDTO>> searchCustomersByName(
+            @RequestParam String name) {
+
+        List<CustomerDTO> customers =
+                customerService.searchCustomersByName(name);
+
+        return ResponseEntity.ok(customers);
+    }
+
+    @Operation(
+            summary = "Find Customer By Email",
+            description = "Fetch customer details using email"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Customer Found"),
+            @ApiResponse(responseCode = "404", description = "Customer Not Found")
+    })
+    @GetMapping("/email")
+    public ResponseEntity<CustomerDTO> findCustomerByEmail(
+            @RequestParam String email) {
+
+        CustomerDTO customerDTO = customerService.findCustomerByEmail(email);
+
+        return ResponseEntity.ok(customerDTO);
     }
     }
 
