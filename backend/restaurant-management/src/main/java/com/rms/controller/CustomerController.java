@@ -13,6 +13,7 @@ import com.rms.dto.CustomerDTO;  //Security perpose
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page; //Pegigenation
+import com.rms.dto.CustomerLoginDTO;
 
 import com.rms.dto.CustomerRegisterDTO;
 import java.util.List;
@@ -184,6 +185,23 @@ public class CustomerController {
             @RequestParam String email) {
 
         CustomerDTO customerDTO = customerService.findCustomerByEmail(email);
+
+        return ResponseEntity.ok(customerDTO);
+    }
+
+    @Operation(
+            summary = "Customer Login",
+            description = "Login using email and password"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login Successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid Email or Password")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<CustomerDTO> loginCustomer(
+            @Valid @RequestBody CustomerLoginDTO dto) {
+
+        CustomerDTO customerDTO = customerService.loginCustomer(dto);
 
         return ResponseEntity.ok(customerDTO);
     }

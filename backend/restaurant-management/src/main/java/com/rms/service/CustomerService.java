@@ -20,6 +20,11 @@ import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.rms.dto.CustomerLoginDTO;
+
+import com.rms.exception.InvalidCredentialsException;
+
+import org.springframework.security.crypto.password.PasswordEncoder; //Password Encoder
 
 @Service
 public class CustomerService {
@@ -42,6 +47,8 @@ public class CustomerService {
 
         // DTO -> Entity
         Customer customer = modelMapper.map(dto, Customer.class);
+
+        customer.setPassword(passwordEncoder.encode(dto.getPassword())); //Password Encodar
 
         Customer savedCustomer = customerRepository.save(customer);
 
@@ -149,4 +156,20 @@ public class CustomerService {
 
         return modelMapper.map(customer, CustomerDTO.class);
     }
+
+    // Login Customer
+    public CustomerDTO loginCustomer(CustomerLoginDTO dto) {
+
+        Customer customer = customerRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(dto.getPassword(), customer.getPassword())) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        return modelMapper.map(customer, CustomerDTO.class);
+    }
+    @Autowired //Password Encoder
+    private PasswordEncoder passwordEncoder;
 }
