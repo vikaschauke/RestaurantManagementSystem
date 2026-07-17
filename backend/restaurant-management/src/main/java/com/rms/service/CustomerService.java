@@ -26,6 +26,9 @@ import com.rms.exception.InvalidCredentialsException;
 
 import org.springframework.security.crypto.password.PasswordEncoder; //Password Encoder
 
+import com.rms.dto.LoginResponseDTO;
+import com.rms.security.JwtUtil;
+
 @Service
 public class CustomerService {
 
@@ -158,7 +161,7 @@ public class CustomerService {
     }
 
     // Login Customer
-    public CustomerDTO loginCustomer(CustomerLoginDTO dto) {
+    public LoginResponseDTO loginCustomer(CustomerLoginDTO dto) {
 
         Customer customer = customerRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() ->
@@ -168,8 +171,17 @@ public class CustomerService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        return modelMapper.map(customer, CustomerDTO.class);
+        CustomerDTO customerDTO = modelMapper.map(customer, CustomerDTO.class);
+
+        String token = jwtUtil.generateToken(customer.getEmail());
+
+        return new LoginResponseDTO(token, customerDTO);
     }
     @Autowired //Password Encoder
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+
 }

@@ -18,6 +18,7 @@ import com.rms.dto.CustomerLoginDTO;
 import com.rms.dto.CustomerRegisterDTO;
 import java.util.List;
 
+import com.rms.dto.LoginResponseDTO;
 
 @Tag(
         name = "Customer Controller",
@@ -198,12 +199,12 @@ public class CustomerController {
             @ApiResponse(responseCode = "401", description = "Invalid Email or Password")
     })
     @PostMapping("/login")
-    public ResponseEntity<CustomerDTO> loginCustomer(
+    public ResponseEntity<LoginResponseDTO> loginCustomer(
             @Valid @RequestBody CustomerLoginDTO dto) {
 
-        CustomerDTO customerDTO = customerService.loginCustomer(dto);
+        LoginResponseDTO response = customerService.loginCustomer(dto);
 
-        return ResponseEntity.ok(customerDTO);
+        return ResponseEntity.ok(response);
     }
     }
 
