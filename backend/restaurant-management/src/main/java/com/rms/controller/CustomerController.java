@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page; //Pegigenation
 import com.rms.dto.CustomerLoginDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import com.rms.dto.CustomerRegisterDTO;
 import java.util.List;
@@ -77,6 +78,8 @@ public class CustomerController {
             @ApiResponse(responseCode = "200", description = "Customers Found")
     })
 
+
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
 
