@@ -53,7 +53,11 @@ public class CustomerService {
 
         customer.setPassword(passwordEncoder.encode(dto.getPassword())); //Password Encodar
 
+        // Role server automatically decide karega
+        customer.setRole("CUSTOMER");
+
         Customer savedCustomer = customerRepository.save(customer);
+
 
         // Entity -> DTO
         return modelMapper.map(savedCustomer, CustomerDTO.class);
@@ -173,7 +177,7 @@ public class CustomerService {
 
         CustomerDTO customerDTO = modelMapper.map(customer, CustomerDTO.class);
 
-        String token = jwtUtil.generateToken(customer.getEmail());
+        String token = jwtUtil.generateToken(customer.getEmail(), customer.getRole());
 
         return new LoginResponseDTO(token, customerDTO);
     }

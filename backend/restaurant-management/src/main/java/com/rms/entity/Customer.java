@@ -30,17 +30,20 @@ public class Customer {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
+    private String role;
+
 
     public Customer() {
     }
 
 
-    public Customer(Long id, String fullName, String email, String phone, String password) {
+    public Customer(Long id, String fullName, String email, String phone, String password, String role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
         this.password = password;
+        this.role = role;
     }
 
     public Long getId() {
@@ -81,5 +84,13 @@ public class Customer {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

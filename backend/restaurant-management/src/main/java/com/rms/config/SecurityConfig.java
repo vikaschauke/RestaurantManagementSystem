@@ -29,7 +29,13 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api/customers/register",
                                 "/api/customers/login"
-                        ).permitAll()
+                          ).permitAll()
+
+                        .requestMatchers("/api/customers/**")
+                        .hasRole("CUSTOMER")
+
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

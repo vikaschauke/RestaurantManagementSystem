@@ -24,10 +24,11 @@ public class JwtUtil {
     }
 
     // Ganrate Token
-    public String generateToken(String email) {
+    public String generateToken(String email,String role) {
 
         return Jwts.builder()
                 .subject(email)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(getSignInKey())
@@ -56,10 +57,23 @@ public class JwtUtil {
         return claims.getExpiration().before(new Date());
     }
 
+
+
     public boolean validateToken(String token, String email) {
 
         String extractedEmail = extractEmail(token);
 
         return extractedEmail.equals(email) && !isTokenExpired(token);
+    }
+
+    public String extractRole(String token) {
+
+        Claims claims = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("role", String.class);
     }
 }
