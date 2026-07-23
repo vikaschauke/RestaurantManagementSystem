@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.NoSuchElementException;
 import com.rms.exception.InvalidCredentialsException;
+import com.rms.exception.FoodItemNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,5 +47,14 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException ex) {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(FoodItemNotFoundException.class)
+    public ResponseEntity<String> handleFoodItemNotFoundException(
+            FoodItemNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
     }
 }
