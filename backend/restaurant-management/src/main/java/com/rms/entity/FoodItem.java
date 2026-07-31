@@ -1,8 +1,10 @@
 package com.rms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 
 @Entity
 @Table(name = "food_items")
@@ -88,5 +90,17 @@ public class FoodItem {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    @OneToMany(mappedBy = "foodItem")
+    @JsonIgnore
+    private List<OrderItem> orderItems;
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

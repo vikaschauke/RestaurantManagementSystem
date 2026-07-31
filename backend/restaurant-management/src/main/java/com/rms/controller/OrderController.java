@@ -1,5 +1,6 @@
 package com.rms.controller;
 
+import com.rms.dto.OrderRequestDTO;
 import com.rms.entity.Order;
 import com.rms.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,10 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/{customerId}")
-    public ResponseEntity<Order> placeOrder(@PathVariable Long customerId) {
+    public ResponseEntity<Order> placeOrder(
+            @PathVariable Long customerId,
+            @RequestBody OrderRequestDTO request) {
 
-        return ResponseEntity.ok(orderService.placeOrder(customerId));
+        return ResponseEntity.ok(orderService.placeOrder(customerId, request));
     }
 }
