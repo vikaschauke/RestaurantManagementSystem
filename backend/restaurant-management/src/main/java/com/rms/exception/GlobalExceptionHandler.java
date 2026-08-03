@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.NoSuchElementException;
-import com.rms.exception.InvalidCredentialsException;
-import com.rms.exception.FoodItemNotFoundException;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,6 +51,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FoodItemNotFoundException.class)
     public ResponseEntity<String> handleFoodItemNotFoundException(
             FoodItemNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<String> handleOrderNotFoundException(
+            OrderNotFoundException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

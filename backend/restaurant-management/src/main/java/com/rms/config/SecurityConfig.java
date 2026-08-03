@@ -28,7 +28,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/api/customers/register",
-                                "/api/customers/login"
+                                "/api/customers/login",
+                                "/error"
                           ).permitAll()
 
                         .requestMatchers("/api/customers/**")
@@ -44,6 +45,12 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/food-items/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/orders")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/*/status")
                         .hasRole("ADMIN")
 
                         .anyRequest().authenticated()

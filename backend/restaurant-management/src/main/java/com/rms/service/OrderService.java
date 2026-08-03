@@ -1,25 +1,23 @@
 package com.rms.service;
 
+import com.rms.dto.OrderItemRequestDTO;
 import com.rms.dto.OrderRequestDTO;
 import com.rms.entity.Customer;
+import com.rms.entity.FoodItem;
 import com.rms.entity.Order;
+import com.rms.entity.OrderItem;
 import com.rms.enums.OrderStatus;
+import com.rms.exception.OrderNotFoundException;
 import com.rms.repository.CustomerRepository;
+import com.rms.repository.FoodItemRepository;
+import com.rms.repository.OrderItemRepository;
 import com.rms.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.rms.dto.OrderItemRequestDTO;
-import com.rms.dto.OrderRequestDTO;
-import com.rms.entity.FoodItem;
-import com.rms.entity.OrderItem;
-import com.rms.repository.FoodItemRepository;
-import com.rms.repository.OrderItemRepository;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.time.LocalDateTime;
 
 @Service
 public class OrderService {
@@ -29,6 +27,12 @@ public class OrderService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private FoodItemRepository foodItemRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     public Order placeOrder(Long customerId, OrderRequestDTO request) {
 
@@ -76,9 +80,38 @@ public class OrderService {
         return orderRepository.save(savedOrder);
     }
 
-    @Autowired
-    private FoodItemRepository foodItemRepository;
+    public Order updateOrderStatus(Long orderId, OrderStatus status) {
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(
+                                "Order not found with ID: " + orderId
+                        )
+                );
+
+        order.setStatus(status);
+
+        return orderRepository.save(order);
+    }
+
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    public List<Order> getOrdersByCustomer(Long customerId) {
+        return orderRepository.findByCustomerId(customerId);
+    }
+    public Order getOrderById(Long orderId) {
+
+        return orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(
+                                "Order not found with ID: " + orderId
+                        )
+                );
+    }
+
+
+
 }
