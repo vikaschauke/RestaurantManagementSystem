@@ -16,6 +16,10 @@ import com.rms.repository.CustomerRepository;
 import com.rms.repository.FoodItemRepository;
 import com.rms.repository.OrderItemRepository;
 import com.rms.repository.OrderRepository;
+import com.rms.dto.OrderResponseDTO;
+import com.rms.dto.OrderItemResponseDTO;
+
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +53,10 @@ public class OrderService {
 
     // Existing method:
     // Direct request se Order create karta hai
-    public Order placeOrder(Long customerId, OrderRequestDTO request) {
+    public OrderResponseDTO placeOrder(
+            Long customerId,
+            OrderRequestDTO request
+    ) {
 
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() ->
@@ -98,14 +105,16 @@ public class OrderService {
         savedOrder.setOrderItems(orderItems);
         savedOrder.setTotalAmount(totalAmount);
 
-        return orderRepository.save(savedOrder);
+        Order finalOrder = orderRepository.save(savedOrder);
+
+        return mapToOrderResponseDTO(finalOrder);
     }
 
 
     // New Day 18 method:
     // Cart ko final Order me convert karta hai
     @Transactional
-    public Order checkoutCart(Long customerId) {
+    public OrderResponseDTO checkoutCart(Long customerId) {
 
         // Step 1: Customer ka cart find karo
         Cart cart = cartRepository.findByCustomerId(customerId)
@@ -205,11 +214,11 @@ public class OrderService {
         cartRepository.save(cart);
 
         // Step 12: Created Order return karo
-        return finalOrder;
+        return mapToOrderResponseDTO(finalOrder);
     }
 
 
-    public Order updateOrderStatus(
+    public OrderResponseDTO updateOrderStatus(
             Long orderId,
             OrderStatus status
     ) {
@@ -224,33 +233,90 @@ public class OrderService {
 
         order.setStatus(status);
 
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+
+        return mapToOrderResponseDTO(updatedOrder);
     }
 
 
-    public List<Order> getAllOrders() {
+    public List<OrderResponseDTO> getAllOrders() {
 
-        return orderRepository.findAll();
+        return orderRepository.findAll()
+                .stream()
+                .map(this::mapToOrderResponseDTO)
+                .collect(Collectors.toList());
     }
 
 
-    public List<Order> getOrdersByCustomer(
+    public List<OrderResponseDTO> getOrdersByCustomer(
             Long customerId
     ) {
 
         return orderRepository
-                .findByCustomerId(customerId);
+                .findByCustomerId(customerId)
+                .stream()
+                .map(this::mapToOrderResponseDTO)
+                .collect(Collectors.toList());
     }
 
+    public OrderResponseDTO getOrderById(Long orderId) {
 
-    public Order getOrderById(Long orderId) {
-
-        return orderRepository.findById(orderId)
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
                         new OrderNotFoundException(
                                 "Order not found with ID: "
                                         + orderId
                         )
                 );
+
+        return mapToOrderResponseDTO(order);
+    }
+
+    private OrderItemResponseDTO mapToOrderItemResponseDTO(OrderItem orderItem) {
+
+        OrderItemResponseDTO dto = new OrderItemResponseDTO();
+
+        dto.setId(orderItem.getId());
+        dto.setFoodItemId(orderItem.getFoodItem().getId());
+        dto.setFoodItemName(orderItem.getFoodItem().getName());
+        dto.setQuantity(orderItem.getQuantity());
+        dto.setPrice(orderItem.getPrice());
+
+        dto.setSubTotal(
+                orderItem.getPrice() * orderItem.getQuantity()
+        );
+
+        return dto;
+    }
+
+    private OrderResponseDTO mapToOrderResponseDTO(Order order) {
+
+        OrderResponseDTO dto = new OrderResponseDTO();
+
+        dto.setId(order.getId());
+
+        dto.setCustomerId(
+                order.getCustomer().getId()
+        );
+
+        dto.setCustomerName(
+                order.getCustomer().getFullName()
+        );
+
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setStatus(order.getStatus());
+        dto.setOrderDate(order.getOrderDate());
+
+        if (order.getOrderItems() != null) {
+
+            dto.setOrderItems(
+                    order.getOrderItems()
+                            .stream()
+                            .map(this::mapToOrderItemResponseDTO)
+                            .collect(Collectors.toList())
+            );
+        }
+
+        return dto;
     }
 }
