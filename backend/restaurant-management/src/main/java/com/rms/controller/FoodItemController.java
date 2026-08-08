@@ -92,4 +92,51 @@ public class FoodItemController {
                 "Food item deleted successfully"
         );
     }
+
+    @GetMapping("/category")
+    public ResponseEntity<List<FoodItemDTO>> filterFoodItemsByCategory(
+            @RequestParam String category) {
+
+        return ResponseEntity.ok(
+                foodItemService.filterFoodItemsByCategory(category)
+        );
+
+
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<List<FoodItemDTO>> filterFoodItemsByPriceRange(
+            @RequestParam double minPrice,
+            @RequestParam double maxPrice) {
+
+        return ResponseEntity.ok(
+                foodItemService.filterFoodItemsByPriceRange(minPrice, maxPrice)
+        );
+    }
+
+    @GetMapping("/availability")
+    public ResponseEntity<List<FoodItemDTO>> filterFoodItemsByAvailability(
+            @RequestParam boolean available) {
+
+        return ResponseEntity.ok(
+                foodItemService.filterFoodItemsByAvailability(available)
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<FoodItemDTO>> filterFoodItems(
+            @RequestParam String category,
+            @RequestParam double minPrice,
+            @RequestParam double maxPrice,
+            @RequestParam boolean available) {
+
+        return ResponseEntity.ok(
+                foodItemService.filterFoodItems(
+                        category,
+                        minPrice,
+                        maxPrice,
+                        available
+                )
+        );
+    }
 }

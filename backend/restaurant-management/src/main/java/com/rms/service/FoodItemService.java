@@ -117,8 +117,65 @@ public class FoodItemService {
                         FoodItemDTO.class
                 )
         );
+    }
+
+        public List<FoodItemDTO> filterFoodItemsByCategory(String category) {
+
+            List<FoodItem> foodItems =
+                    foodItemRepository.findByCategoryIgnoreCase(category);
+
+            return foodItems.stream()
+                    .map(foodItem ->
+                            modelMapper.map(foodItem, FoodItemDTO.class))
+                    .toList();
+        }
+
+    public List<FoodItemDTO> filterFoodItemsByPriceRange(
+            double minPrice,
+            double maxPrice) {
+
+        List<FoodItem> foodItems =
+                foodItemRepository.findByPriceBetween(minPrice, maxPrice);
+
+        return foodItems.stream()
+                .map(foodItem ->
+                        modelMapper.map(foodItem, FoodItemDTO.class))
+                .toList();
+    }
+
+    public List<FoodItemDTO> filterFoodItemsByAvailability(boolean available) {
+
+        List<FoodItem> foodItems =
+                foodItemRepository.findByAvailable(available);
+
+        return foodItems.stream()
+                .map(foodItem ->
+                        modelMapper.map(foodItem, FoodItemDTO.class))
+                .toList();
+    }
+
+    public List<FoodItemDTO> filterFoodItems(
+            String category,
+            double minPrice,
+            double maxPrice,
+            boolean available) {
+
+        List<FoodItem> foodItems =
+                foodItemRepository
+                        .findByCategoryIgnoreCaseAndPriceBetweenAndAvailable(
+                                category,
+                                minPrice,
+                                maxPrice,
+                                available
+                        );
+
+        return foodItems.stream()
+                .map(foodItem ->
+                        modelMapper.map(foodItem, FoodItemDTO.class))
+                .toList();
+    }
 
 
 
 
-}}
+}
