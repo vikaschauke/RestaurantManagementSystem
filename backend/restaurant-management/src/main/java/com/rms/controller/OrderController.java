@@ -55,6 +55,16 @@ public class OrderController {
         );
     }
 
+        @GetMapping("/customer/{customerId}/latest")
+        public ResponseEntity<OrderResponseDTO> getLatestOrderByCustomer(
+                @PathVariable Long customerId) {
+
+            return ResponseEntity.ok(
+                    orderService.getLatestOrderByCustomer(customerId)
+            );
+
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDTO> getOrderById(
             @PathVariable Long orderId) {

@@ -127,9 +127,31 @@ public class GlobalExceptionHandler {
         );
     }
 
+
+
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleOrderNotFoundException(
             OrderNotFoundException ex,
+            HttpServletRequest request) {
+
+        ApiErrorResponse errorResponse = new ApiErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(
+                errorResponse,
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(CustomerNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleCustomerNotFoundException(
+            CustomerNotFoundException ex,
             HttpServletRequest request) {
 
         ApiErrorResponse errorResponse = new ApiErrorResponse(

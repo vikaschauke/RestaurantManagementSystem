@@ -13,6 +13,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByCustomerId(Long customerId);
 
+    Order findTopByCustomerIdOrderByOrderDateDesc(Long customerId);
+
     @Query("SELECT SUM(o.totalAmount) FROM Order o")
     Double getTotalRevenue();
 

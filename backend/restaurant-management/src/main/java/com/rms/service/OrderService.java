@@ -29,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rms.exception.CustomerNotFoundException;
+
 @Service
 public class OrderService {
 
@@ -248,9 +250,15 @@ public class OrderService {
     }
 
 
-    public List<OrderResponseDTO> getOrdersByCustomer(
-            Long customerId
-    ) {
+    public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) {
+
+        customerRepository.findById(customerId)
+                .orElseThrow(() ->
+                        new CustomerNotFoundException(
+                                "Customer not found with ID: " + customerId
+                        )
+                );
+
 
         return orderRepository
                 .findByCustomerId(customerId)
@@ -259,11 +267,32 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public OrderResponseDTO getLatestOrderByCustomer(Long customerId) {
+
+        customerRepository.findById(customerId)
+                .orElseThrow(() ->
+                        new CustomerNotFoundException(
+                                "Customer not found with ID: " + customerId
+                        )
+                );
+
+        Order order = orderRepository
+                .findTopByCustomerIdOrderByOrderDateDesc(customerId);
+
+        if (order == null) {
+            throw new OrderNotFoundException(
+                    "No orders found for customer ID: " + customerId
+            );
+        }
+
+        return mapToOrderResponseDTO(order);
+    }
+
     public OrderResponseDTO getOrderById(Long orderId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new OrderNotFoundException(
+                            new OrderNotFoundException(
                                 "Order not found with ID: "
                                         + orderId
                         )
